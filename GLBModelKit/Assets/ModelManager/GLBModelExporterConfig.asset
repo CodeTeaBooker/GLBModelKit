@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52c8543e53051b9439f1cc73b43c3af6, type: 3}
   m_Name: GLBModelExporterConfig
   m_EditorClassIdentifier: 
-  ExportBasePath: Exports
+  ExportBasePath: Assets/Exports
   FileFormat: 0
   ExportNames: 1
   RequireExtensions: 0

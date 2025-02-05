@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: GLBModelManagerConfig
   m_EditorClassIdentifier: 
   MaxCacheSize: 5
-  MaxFileSizeInMB: 100
-  ModelPath: Models/MyModel.glb
+  MaxFileSizeInMB: 16
+  ModelPath: glassModel.glb
   ImportOnStart: 0
   MaxRetryCount: 3
   RetryDelay: 1
   DebugMode: 0
-  _importConfig: {fileID: 0}
+  _importConfig: {fileID: 11400000, guid: 904c43eb52fdd684abe5cb557240b13c, type: 2}
