@@ -139,18 +139,6 @@ namespace DevToolKit.Models.Events
         }
 
         /// <summary>
-        /// Checks if the dispatcher is disposed
-        /// </summary>
-        /// <exception cref="ObjectDisposedException">Thrown if the dispatcher is disposed</exception>
-        private void ThrowIfDisposed()
-        {
-            if (_disposed)
-            {
-                throw new ObjectDisposedException(GetType().Name);
-            }
-        }
-
-        /// <summary>
         /// Gets the current count of registered listeners
         /// </summary>
         public int ListenerCount
@@ -161,6 +149,18 @@ namespace DevToolKit.Models.Events
                 {
                     return _eventListeners.Count;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Checks if the dispatcher is disposed
+        /// </summary>
+        /// <exception cref="ObjectDisposedException">Thrown if the dispatcher is disposed</exception>
+        private void ThrowIfDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(GetType().Name);
             }
         }
 

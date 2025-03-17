@@ -13,12 +13,6 @@ namespace DevToolKit.Models.Cache
         private bool _disposed;
         private const string LOG_DOMAIN = "ModelInstanceManager";
 
-        private void ThrowIfDisposed()
-        {
-            if (_disposed)
-                throw new ObjectDisposedException(GetType().Name);
-        }
-
         private void SafeDestroyGameObject(GameObject obj)
         {
             if (obj != null && !obj.Equals(null))
@@ -115,6 +109,12 @@ namespace DevToolKit.Models.Cache
             }
             _instancesCache.Clear();
             _instancePathMap.Clear();
+        }
+
+        private void ThrowIfDisposed()
+        {
+            if (_disposed)
+                throw new ObjectDisposedException(GetType().Name);
         }
 
         public void Dispose()

@@ -11,8 +11,7 @@ namespace DevToolKit.Models.Loaders
     {
         private readonly IModelLoader _innerLoader;
         private readonly IRetryStrategy _retryStrategy;
-        private readonly CancellationTokenSource _linkedCancellation = new CancellationTokenSource();
-
+       
         private const string LOG_DOMAIN = nameof(RetryableModelLoader);
 
         public override int MaxRetryCount => _retryStrategy.MaxRetryCount;
@@ -75,7 +74,6 @@ namespace DevToolKit.Models.Loaders
         public override void Cancel()
         {
             base.Cancel();
-            _linkedCancellation.Cancel();
             _innerLoader?.Cancel();
         }
 
@@ -91,7 +89,6 @@ namespace DevToolKit.Models.Loaders
                         try { disposable.Dispose(); } catch (ObjectDisposedException) { }
                     }
                 }
-                _linkedCancellation.Dispose();
             }
             base.Dispose(disposing);
         }

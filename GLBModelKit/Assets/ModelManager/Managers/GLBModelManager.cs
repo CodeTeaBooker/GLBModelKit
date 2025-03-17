@@ -203,6 +203,7 @@ namespace DevToolKit.Models.Managers
             }
 
             UpdateState(ManagerState.Loading);
+
             try
             {
                 ResetCancellationToken();
