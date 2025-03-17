@@ -1,47 +1,3 @@
-//using DevToolKit.Models.Core;
-//using System;
-//using System.Collections.Generic;
-//using UnityEngine;
-
-//namespace DevToolKit.Models.Events
-//{
-//    public class EventDispatcher : IDisposable
-//    {
-//        private readonly List<IModelCacheListener> _listeners = new List<IModelCacheListener>();
-//        private bool _disposed;
-//        public void AddListener(IModelCacheListener listener)
-//        {
-//            if (_disposed)
-//                throw new ObjectDisposedException(nameof(EventDispatcher));
-//            if (listener == null)
-//                return;
-//            if (!_listeners.Contains(listener))
-//                _listeners.Add(listener);
-//        }
-//        public void RemoveListener(IModelCacheListener listener)
-//        {
-//            if (!_disposed && listener != null)
-//                _listeners.Remove(listener);
-//        }
-//        public void NotifyStateChanged(ModelCacheEventArgs args)
-//        {
-//            if (_disposed)
-//                return;
-//            foreach (var listener in _listeners.ToArray())
-//            {
-//                try { listener.OnCacheStateChanged(args); }
-//                catch (Exception ex) { Debug.LogError($"[EventDispatcher] Error notifying listener: {ex.Message}"); }
-//            }
-//        }
-//        public void Dispose()
-//        {
-//            _disposed = true;
-//            _listeners.Clear();
-//        }
-//    }
-//}
-
-
 using DevToolKit.Models.Core;
 using System;
 using System.Collections.Generic;
@@ -105,6 +61,7 @@ namespace DevToolKit.Models.Events
         public void NotifyStateChanged(ModelCacheEventArgs args)
         {
             ThrowIfDisposed();
+            if (args == null) return;
 
             var listeners = _cachedEventListeners;
             if (listeners == null)
@@ -117,6 +74,8 @@ namespace DevToolKit.Models.Events
                 }
             }
 
+            if (listeners.Length == 0) return;
+
             foreach (var listener in listeners)
             {
                 try
@@ -126,6 +85,41 @@ namespace DevToolKit.Models.Events
                 catch (Exception ex)
                 {
                     Debug.LogError($"[{LOG_DOMAIN}] Error notifying listener: {ex.Message}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Notifies all registered listeners of multiple state changes in a batch operation
+        /// </summary>
+        /// <param name="eventsBatch">A collection of event arguments containing the state change information</param>
+        public void NotifyStateChangedBatch(IReadOnlyList<ModelCacheEventArgs> eventsBatch)
+        {
+            ThrowIfDisposed();
+            if (eventsBatch == null || eventsBatch.Count == 0) return;
+
+            var listeners = _cachedEventListeners;
+            if (listeners == null)
+            {
+                lock (_lock)
+                {
+                    if (_disposed) return;
+                    _cachedEventListeners = _eventListeners.ToArray();
+                    listeners = _cachedEventListeners;
+                }
+            }
+
+            if (listeners.Length == 0) return;
+
+            foreach (var listener in listeners)
+            {
+                try
+                {
+                    listener?.OnCacheStateChangedBatch(eventsBatch);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"[{LOG_DOMAIN}] Error in batch notification to listener: {ex.Message}");
                 }
             }
         }
