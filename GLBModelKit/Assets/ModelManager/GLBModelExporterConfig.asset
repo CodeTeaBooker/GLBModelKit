@@ -15,10 +15,10 @@ MonoBehaviour:
   ExportBasePath: Assets/Exports
   FileFormat: 0
   ExportNames: 1
-  RequireExtensions: 0
+  RequireExtensions: 1
   ExportAnimations: 1
   ExportVertexColors: 1
-  TextureQuality: 90
+  TextureQuality: 40
   BlendShapeExportProperties: -1
   MaxRetryCount: 3
   RetryDelay: 1

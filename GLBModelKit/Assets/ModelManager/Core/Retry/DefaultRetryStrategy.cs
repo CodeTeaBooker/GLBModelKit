@@ -90,8 +90,12 @@ namespace DevToolKit.Models.Core
 
         public virtual float GetDelayForAttempt(int attemptCount)
         {
-            // Add small random jitter to prevent thundering herd
-            return RetryDelay * UnityEngine.Random.Range(0.8f, 1.2f);
+            // Base delay
+            float delay = RetryDelay;
+
+            // Add random jitter in the range of ±25
+            delay *= UnityEngine.Random.Range(0.75f, 1.25f);
+            return delay;
         }
 
         public override string ToString()

@@ -1,6 +1,6 @@
 using DevToolKit.Models.Core;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using UnityEngine;
 using UnityGLTF;
 
@@ -49,27 +49,93 @@ namespace DevToolKit.Models.Config
         [Tooltip("Enable debug logging")]
         public bool DebugMode = false;
 
-        protected override string[] ValidateConfiguration()
+        /// <summary>
+        /// Validates the configuration
+        /// </summary>
+        protected override void ValidateConfigurationInternal(List<ValidationError> errors)
         {
-            var errors = new List<string>();
+            // Validate required fields
+            ValidateRequired(errors, ExportBasePath, nameof(ExportBasePath));
 
-           
-            if (string.IsNullOrEmpty(ExportBasePath))
-                errors.Add($"{nameof(ExportBasePath)} cannot be empty");
+            // Validate numerical ranges
+            ValidateRange(errors, TextureQuality, 0, 100, nameof(TextureQuality));
+            ValidateRange(errors, MaxRetryCount, 1, 10, nameof(MaxRetryCount));
+            ValidateRange(errors, RetryDelay, 0.1f, 5f, nameof(RetryDelay));
 
-          
-            if (TextureQuality < 0 || TextureQuality > 100)
-                errors.Add($"{nameof(TextureQuality)} must be between 0 and 100");
-
-            if (MaxRetryCount < 1 || MaxRetryCount > 10)
-                errors.Add($"{nameof(MaxRetryCount)} must be between 1 and 10");
-
-            if (RetryDelay < 0.1f || RetryDelay > 5f)
-                errors.Add($"{nameof(RetryDelay)} must be between 0.1 and 5");
-
-            return errors.Where(e => !string.IsNullOrEmpty(e)).ToArray();
+            // Validate enum values
+            ValidateEnum(errors, FileFormat, nameof(FileFormat));
+            ValidateEnum(errors, BlendShapeExportProperties, nameof(BlendShapeExportProperties));
         }
 
+        /// <summary>
+        /// Validates default values
+        /// </summary>
+        protected override void ValidateDefaultValues(List<ValidationError> errors)
+        {
+            // Check if default values are optimal
+            if (TextureQuality < 30)
+            {
+                errors.Add(new ValidationError(nameof(TextureQuality),
+                    $"Default texture quality of {TextureQuality} is very low, consider increasing it for better visuals",
+                    ValidationSeverity.Warning));
+            }
+
+            if (MaxRetryCount < 2)
+            {
+                errors.Add(new ValidationError(nameof(MaxRetryCount),
+                    "Low retry count may lead to failure in unstable networks",
+                    ValidationSeverity.Warning));
+            }
+        }
+
+        /// <summary>
+        /// Validates relationships between properties
+        /// </summary>
+        protected override void ValidateRelationships(List<ValidationError> errors)
+        {
+            // Check if the export path exists (warning only)
+            if (!string.IsNullOrEmpty(ExportBasePath))
+            {
+                string fullPath = Path.GetFullPath(ExportBasePath);
+                if (!Directory.Exists(fullPath))
+                {
+                    errors.Add(new ValidationError(nameof(ExportBasePath),
+                        $"Export directory does not exist: {fullPath}",
+                        ValidationSeverity.Warning));
+                }
+            }
+
+            // Check property relationships
+            if (RequireExtensions && !ExportNames)
+            {
+                errors.Add(new ValidationError(
+                    $"{nameof(RequireExtensions)}/{nameof(ExportNames)}",
+                    "When RequireExtensions is true, ExportNames should also be true for better compatibility",
+                    ValidationSeverity.Warning));
+            }
+
+            // Check performance implications
+            if (ExportVertexColors && TextureQuality > 90)
+            {
+                errors.Add(new ValidationError(
+                    $"{nameof(ExportVertexColors)}/{nameof(TextureQuality)}",
+                    "High texture quality combined with vertex colors export may impact performance",
+                    ValidationSeverity.Warning));
+            }
+
+            // Check blend shape export properties
+            if (BlendShapeExportProperties == GLTFSettings.BlendShapeExportPropertyFlags.None && ExportAnimations)
+            {
+                errors.Add(new ValidationError(
+                    $"{nameof(BlendShapeExportProperties)}/{nameof(ExportAnimations)}",
+                    "BlendShapeExportProperties is set to None but animations are enabled. This may result in limited animation support.",
+                    ValidationSeverity.Warning));
+            }
+        }
+
+        /// <summary>
+        /// Creates export settings from the configuration
+        /// </summary>
         public GLTFSettings CreateExportSettings()
         {
             var settings = GLTFSettings.GetOrCreateSettings();

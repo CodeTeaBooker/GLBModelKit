@@ -17,8 +17,8 @@ MonoBehaviour:
   MaximumLod: 300
   Timeout: 8
   Multithreaded: 1
-  HideSceneObjDuringLoad: 0
-  HideModelAfterLoad: 0
+  HideSceneObjDuringLoad: 1
+  HideModelAfterLoad: 1
   ImportNormals: 0
   ImportTangents: 0
   SwapUVs: 0

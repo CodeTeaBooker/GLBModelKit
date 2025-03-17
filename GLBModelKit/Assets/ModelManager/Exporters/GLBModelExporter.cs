@@ -1,7 +1,9 @@
 using DevToolKit.Models.Config;
 using DevToolKit.Models.Core;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityGLTF;
 
@@ -14,9 +16,15 @@ namespace DevToolKit.Models.Exporters
         public GLBModelExporter(GLBModelExporterConfigSO config)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
-            if (!_config.Validate(out string error))
+            if (!_config.Validate(out IReadOnlyList<ModelConfigBase.ValidationError> errors))
             {
-                throw new ArgumentException($"Exporter config invalid: {error}");
+                var errorMessages = string.Join(
+                    Environment.NewLine,
+                    errors.Where(e => e.Severity >= ModelConfigBase.ValidationSeverity.Error)
+                          .Select(e => $"{e.PropertyName}: {e.Message}")
+                );
+
+                throw new ArgumentException($"Exporter config invalid: {errorMessages}");
             }
         }
 

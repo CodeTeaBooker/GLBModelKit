@@ -9,6 +9,10 @@ using UnityEngine;
 using UnityGLTF;
 using DevToolKit.Models.Cache;
 using DevToolKit.Models.Exporters;
+using System.Collections.Generic;
+using System.Linq;
+
+
 
 
 #if UNITY_EDITOR
@@ -155,10 +159,26 @@ namespace DevToolKit.Models.Managers
 
             try
             {
-                if (!_exporterConfig.Validate(out string error))
+                if (!_exporterConfig.Validate(out IReadOnlyList<ModelConfigBase.ValidationError> errors))
                 {
-                    Debug.LogError($"[{LOG_DOMAIN}] Invalid exporter configuration: {error}");
-                    return;
+                    var criticalErrors = errors.Where(e => e.Severity >= ModelConfigBase.ValidationSeverity.Error).ToList();
+
+                    if (criticalErrors.Any())
+                    {
+                        var errorMessages = string.Join(
+                            Environment.NewLine,
+                            criticalErrors.Select(e => $"{e.PropertyName}: {e.Message}")
+                        );
+
+                        Debug.LogError($"[{LOG_DOMAIN}] Invalid exporter configuration:{Environment.NewLine}{errorMessages}");
+                        return;
+                    }
+
+                    // 可选：记录警告
+                    foreach (var warning in errors.Where(e => e.Severity == ModelConfigBase.ValidationSeverity.Warning))
+                    {
+                        Debug.LogWarning($"[{LOG_DOMAIN}] Config warning: {warning.PropertyName} - {warning.Message}");
+                    }
                 }
 
                 _exporter = new GLBModelExporter(_exporterConfig);
@@ -434,11 +454,29 @@ namespace DevToolKit.Models.Managers
                 error = "Missing manager configuration!";
                 return false;
             }
-            if (!_config.Validate(out string configError))
+
+            if (!_config.Validate(out IReadOnlyList<ModelConfigBase.ValidationError> errors))
             {
-                error = $"Invalid manager configuration: {configError}";
-                return false;
+                var criticalErrors = errors.Where(e => e.Severity >= ModelConfigBase.ValidationSeverity.Error).ToList();
+
+                if (criticalErrors.Any())
+                {
+                    var errorMessages = string.Join(
+                        Environment.NewLine,
+                        criticalErrors.Select(e => $"{e.PropertyName}: {e.Message}")
+                    );
+
+                    error = $"Invalid manager configuration:{Environment.NewLine}{errorMessages}";
+                    return false;
+                }
+
+                // 可选：记录警告
+                foreach (var warning in errors.Where(e => e.Severity == ModelConfigBase.ValidationSeverity.Warning))
+                {
+                    Debug.LogWarning($"[{LOG_DOMAIN}] Config warning: {warning.PropertyName} - {warning.Message}");
+                }
             }
+
             error = null;
             return true;
         }
@@ -518,7 +556,7 @@ namespace DevToolKit.Models.Managers
         #region Editor
 #if UNITY_EDITOR
         [CustomEditor(typeof(GLBModelManager))]
-        public class GLBModelManagerEditor : Editor
+        public class GLBModelManagerEditor : UnityEditor.Editor
         {
             public override void OnInspectorGUI()
             {
