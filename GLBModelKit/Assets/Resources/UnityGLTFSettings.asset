@@ -125,6 +125,32 @@ MonoBehaviour:
   m_Name: LightsPunctualExport
   m_EditorClassIdentifier: 
   enabled: 1
+--- !u!114 &-204442256972697401
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06b516fa9f5941be92bd6cecf2dd5ca5, type: 3}
+  m_Name: VisibilityImport
+  m_EditorClassIdentifier: 
+  enabled: 1
+--- !u!114 &-111963000581640229
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2b6fa8618a247c3a77768773459dcd5, type: 3}
+  m_Name: VisibilityExport
+  m_EditorClassIdentifier: 
+  enabled: 0
 --- !u!114 &1
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,6 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d9a5969691dba845877d0a52b6d9397, type: 3}
   m_Name: UnityGLTFSettings
   m_EditorClassIdentifier: 
+  packageVersion: 
   shaderStrippingSettings:
     stripPassesFromAllShaders: 0
     stripPasses: 0
@@ -151,6 +178,7 @@ MonoBehaviour:
   - {fileID: 3002336031001739267}
   - {fileID: 4329768781214837870}
   - {fileID: 7831443504316201020}
+  - {fileID: -204442256972697401}
   ExportPlugins:
   - {fileID: -4833630240015503050}
   - {fileID: 7407185624124767028}
@@ -162,6 +190,7 @@ MonoBehaviour:
   - {fileID: -3853323816343751682}
   - {fileID: 323821691066127615}
   - {fileID: -5177652631068262925}
+  - {fileID: -111963000581640229}
   exportNames: 1
   exportFullPath: 0
   requireExtensions: 0
